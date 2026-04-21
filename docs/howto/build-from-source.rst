@@ -126,6 +126,58 @@ Install:
 
    sudo cmake --install build
 
+v80++ (Linker) — Static Shell
+==============================
+
+After installing ``v80-smi``, the linker's static shell must be built
+before hardware vrtbins can be linked. The static shell is the pre-built
+FPGA platform base that every hardware vrtbin is linked against. It contains
+platform IP — including the SMBus controller used for board management —
+that requires a **Vivado Enterprise license** to build.
+
+Source Vivado **2025.1** and Vitis **2025.1** and ensure a Vivado Enterprise
+license is configured for your site:
+
+.. code-block:: bash
+
+   source <path-to-vivado>/settings64.sh
+   source <path-to-vitis>/settings64.sh
+
+For ``csh``/``tcsh`` users:
+
+.. code-block:: csh
+
+   source <path-to-vivado>/settings64.csh
+   source <path-to-vitis>/settings64.csh
+
+.. note::
+
+   Vivado Enterprise license configuration is site-specific. Contact your
+   license administrator if you are unsure how licenses are served at your
+   site.
+
+The SMBus IP (``xilinx.com:ip:smbus:1.1``) used for board management is
+**not included** in this repository and is not bundled with Vivado. It must
+be downloaded separately from the AMD member portal and placed into the
+local IP repository before building:
+
+1. Download the SMBus IP from https://www.xilinx.com/member/v80.html
+   (AMD account required).
+2. Copy the downloaded IP directory into ``linker/resources/base/iprepo/``
+   so that Vivado can locate it during synthesis.
+
+See the `AVED rebuild guide <https://xilinx.github.io/AVED/>`_ for
+additional details.
+
+Then run the linker install script from the repository root:
+
+.. code-block:: bash
+
+   bash scripts/root-design-build.sh
+
+**This step takes several hours** — it runs full Vivado synthesis and
+implementation to produce the static shell artifacts.
+
 Examples
 ========
 

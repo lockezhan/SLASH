@@ -109,11 +109,56 @@ required on the build machine, not on every target:
    (``Packages`` / ``repodata/``) so that hosting the output directory as a
    repository avoids this limitation.
 
+Static Shell
+============
+
+The *static shell* is the pre-built FPGA platform base that ships inside
+the ``v80++`` package. It contains the fixed platform infrastructure —
+including the SMBus controller IP used for board management — that every
+hardware vrtbin is linked against.
+
+Building it requires **Vivado 2025.1** and **Vitis 2025.1**, plus a
+**Vivado Enterprise license** (the SMBus IP is not available under the
+standard tier). Source both tools before running the package build:
+
+.. code-block:: bash
+
+   source <path-to-vivado>/settings64.sh
+   source <path-to-vitis>/settings64.sh
+
+For ``csh``/``tcsh`` users:
+
+.. code-block:: csh
+
+   source <path-to-vivado>/settings64.csh
+   source <path-to-vitis>/settings64.csh
+
+.. note::
+
+   Vivado Enterprise license configuration is site-specific. Contact your
+   license administrator if you are unsure how licenses are served at your
+   site.
+
+The SMBus IP (``xilinx.com:ip:smbus:1.1``) used for board management is
+**not included** in this repository and is not bundled with Vivado. It must
+be downloaded separately from the AMD member portal and placed into the
+local IP repository before building:
+
+1. Download the SMBus IP from https://www.xilinx.com/member/v80.html
+   (AMD account required).
+2. Copy the downloaded IP directory into ``linker/resources/base/iprepo/``
+   so that Vivado can locate it during synthesis.
+
+See the `AVED rebuild guide <https://xilinx.github.io/AVED/>`_ for
+additional details.
+
 Build the Packages
 ==================
 
 All packages — including the AMI driver package — are produced by a single
-script run from the repository root:
+script run from the repository root. The static shell is built
+automatically as part of this step. **Expect the build to take several
+hours** while Vivado synthesises and implements the platform design.
 
 .. tab-set::
 
@@ -282,10 +327,10 @@ Program the Board
 =================
 
 After installing the packages, the board's flash memory must be programmed
-with the abstract shell before the system can be used. This step is required:
+with the static shell before the system can be used. This step is required:
 
 - on the **first install** of SLASH, and
-- when **upgrading** to a version that changes the abstract shell (noted in
+- when **upgrading** to a version that changes the static shell (noted in
   the release notes).
 
 It is **not** required after crashes, daemon restarts, or other normal
